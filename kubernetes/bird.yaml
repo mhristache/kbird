@@ -1,0 +1,41 @@
+apiVersion: apps/v1beta2
+kind: DaemonSet
+metadata:
+  name: bird
+spec:
+  selector:
+    matchLabels:
+      app: bird
+  template:
+    metadata:
+      labels:
+        app: bird
+    spec:
+      terminationGracePeriodSeconds: 0
+      hostNetwork: true
+      containers:
+      - name: bird
+        image: maximih/bird2
+        imagePullPolicy: IfNotPresent
+        args:
+          - -c
+          - /config/bird.conf
+        tty: true
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - all
+            add:
+              - net_raw
+      volumes:
+        - name: config
+          configMap:
+            name: bird-config
+            items:
+              - path: bird.conf
+                key: bird.conf
