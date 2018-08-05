@@ -1,0 +1,7 @@
+[package]
+name = "kbird"
+version = "0.1.0"
+authors = ["Maximilian Hristache <mhristache@gmail.com>"]
+
+[dependencies]
+inotify = "0.5.1"
