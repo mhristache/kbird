@@ -27,7 +27,7 @@ BIRD2 daemon is started via a wrapper called `kbird` which is monitoring the con
 So, to update the config it's enough to edit the `configmap` created in step 1:
 
 ```
-kubectl edit configmap bird-config
+kubectl edit configmap config
 ```
 
 However, as the formatting of the BIRD config is messed up, it's easier to replace the configmap with a new one created from a `bird.conf` file:
