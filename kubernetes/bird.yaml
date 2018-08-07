@@ -1,21 +1,21 @@
 apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
-  name: bird
+  name: kbird
 spec:
   selector:
     matchLabels:
-      app: bird
+      app: kbird
   template:
     metadata:
       labels:
-        app: bird
+        app: kbird
     spec:
       terminationGracePeriodSeconds: 0
       hostNetwork: true
       containers:
-      - name: bird
-        image: maximih/bird2
+      - name: kbird
+        image: mhristache/kbird
         imagePullPolicy: IfNotPresent
         args:
           - -c
