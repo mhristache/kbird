@@ -1,6 +1,29 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kbird-system
+  labels:
+    app: kbird
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: kbird-system
+  name: config
+data:
+  bird.conf: |
+    log stderr all;
+    router id 10.10.10.10;
+    ipv4 table master4;
+    protocol kernel kernel4 {
+        ipv4;
+    }
+---
 apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
+metadata:
+  namespace: kbird-system
   name: kbird
 spec:
   selector:
@@ -15,27 +38,25 @@ spec:
       hostNetwork: true
       containers:
       - name: kbird
-        image: mhristache/kbird
+        image: mhristache/kbird:0.1
         imagePullPolicy: IfNotPresent
-        args:
-          - -c
-          - /config/bird.conf
         tty: true
         volumeMounts:
           - name: config
             mountPath: /config
         securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
+          privileged: true
           capabilities:
             drop:
               - all
             add:
               - net_raw
+              - net_admin
       volumes:
         - name: config
           configMap:
-            name: bird-config
+            name: config
             items:
               - path: bird.conf
                 key: bird.conf
+
