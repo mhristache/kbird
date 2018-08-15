@@ -13,10 +13,7 @@ metadata:
 data:
   bird.conf: |
     log stderr all;
-    router id 10.10.10.10;
-    ipv4 table master4;
-    protocol kernel kernel4 {
-        ipv4;
+    protocol device {
     }
 ---
 apiVersion: apps/v1beta2
