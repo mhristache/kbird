@@ -1,0 +1,3 @@
+image: mhristache/kbird:0.2
+config:
+networks: {}

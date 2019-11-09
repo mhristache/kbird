@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbird
+  labels:
+    app.kubernetes.io/name: kbird
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kbird
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/version: {{ .Chart.AppVersion }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kbird
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{{- $root := . -}}
+          {{- $lastIndex := sub (len $root.Values.networks) 1 }}
+          {{- range $i, $key := (keys $root.Values.networks) }}
+            {
+              "interface": {{ $key | quote }},
+              "interfaceRequest": {{ $key | quote }},
+              "name": {{ $key | quote }}
+            }{{- if ne $i $lastIndex -}},{{ end }}
+          {{- end }}
+          ]
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: kbird
+        image: {{ .Values.image }}
+        imagePullPolicy: IfNotPresent
+        tty: true
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        securityContext:
+          privileged: true
+          capabilities:
+            drop:
+              - all
+            add:
+              - net_raw
+              - net_admin
+      volumes:
+        - name: config
+          configMap:
+            name: config
+            items:
+              - path: bird.conf
+                key: bird.conf

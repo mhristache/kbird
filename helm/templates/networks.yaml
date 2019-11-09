@@ -1,0 +1,14 @@
+{{- $_ := . }}
+{{- range $key, $value := .Values.networks }}
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: {{ $key }}
+  labels:
+    app.kubernetes.io/name: kbird
+    release: {{ $_.Release.Name }}
+spec:
+  config: |
+{{ $value | toPrettyJson | indent 4 }}
+{{- end -}}
