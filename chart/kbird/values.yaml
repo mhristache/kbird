@@ -1,0 +1,4 @@
+image: mhristache/kbird:0.3
+forwarding: yes
+config:
+networks: {}

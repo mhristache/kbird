@@ -41,6 +41,11 @@ spec:
       - name: kbird
         image: {{ .Values.image }}
         imagePullPolicy: IfNotPresent
+        {{- if .Values.forwarding }}
+        env:
+        - name: IP_FORWARDING
+          value: "1"
+        {{- end}}
         tty: true
         volumeMounts:
           - name: config
