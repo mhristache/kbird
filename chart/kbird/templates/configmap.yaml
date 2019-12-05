@@ -11,3 +11,7 @@ metadata:
 data:
   bird.conf: |-
     {{- if .Values.config }} {{ .Values.config | nindent 4 }} {{ else }} {{ .Files.Get "etc/bird.conf" | nindent 4 }} {{ end }}
+  {{- if .Values.init }}
+  init.sh: |-
+    {{ .Values.init | nindent 4 }}
+  {{- end }}

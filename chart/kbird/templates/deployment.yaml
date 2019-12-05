@@ -37,15 +37,28 @@ spec:
           ]
     spec:
       terminationGracePeriodSeconds: 0
+      {{- if .Values.init }}
+      initContainers:
+      - name: init
+        image: {{ .Values.image.init }}
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '/config/init.sh']
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        securityContext:
+          privileged: true
+          capabilities:
+            drop:
+              - all
+            add:
+              - net_raw
+              - net_admin
+      {{- end}}
       containers:
       - name: kbird
-        image: {{ .Values.image }}
+        image: {{ .Values.image.kbird }}
         imagePullPolicy: IfNotPresent
-        {{- if .Values.forwarding }}
-        env:
-        - name: IP_FORWARDING
-          value: "1"
-        {{- end}}
         tty: true
         volumeMounts:
           - name: config
@@ -65,3 +78,7 @@ spec:
             items:
               - path: bird.conf
                 key: bird.conf
+              {{- if .Values.init }}
+              - path: init.sh
+                key: init.sh
+              {{- end}}

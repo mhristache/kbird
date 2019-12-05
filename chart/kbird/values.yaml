@@ -1,4 +1,16 @@
-image: mhristache/kbird:0.3
+image:
+  kbird: mhristache/kbird:0.2
+  init: nicolaka/netshoot:latest
 forwarding: yes
 config:
 networks: {}
+init: |-
+  echo "Enabling ip forwarding"
+  sysctl -w net.ipv4.ip_forward=1
+  sysctl -w net.ipv6.conf.all.forwarding=1
+
+  echo "Disabling k8s default interface (eth0)"
+  ip link set eth0 down
+
+  echo "Adding a workaround for udp checksum offloading issues (https://github.com/projectcalico/felix/issues/40)"
+  iptables -A POSTROUTING -t mangle -p udp -j CHECKSUM --checksum-fill

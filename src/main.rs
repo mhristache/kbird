@@ -1,7 +1,5 @@
 use inotify::{Inotify, WatchMask};
-use std::env::var_os;
 use std::process::Command;
-use sysctl::{Ctl, Sysctl};
 
 // the path to the BIRD config
 const BIRD_CFG: &'static str = "/config/bird.conf";
@@ -12,32 +10,7 @@ const BIRD_BIN: &'static str = "bird";
 // the path to BIRDC binary
 const BIRDC_BIN: &'static str = "birdc";
 
-// the kernel settings needed to enabled IP forwarding
-const CTLNAME: &str = "net.ipv4.ip_forward";
-
-// the env variable expected to be set to enable IP forwarding
-const IP_FORWARDING: &str = "IP_FORWARDING";
-
 fn main() {
-    if var_os(IP_FORWARDING).is_some() {
-        println!("checking if ip forwarding is enabled");
-        match Ctl::new(CTLNAME) {
-            Ok(ctl) => match ctl.value_string() {
-                Ok(v) if &*v != "1" => {
-                    ctl.set_value_string("1").unwrap_or_else(|e| {
-                        panic!("could not enable ip forwarding: {:?}", e);
-                    });
-                    println!("ip forwarding was enabled successfully");
-                }
-                Err(e) => panic!("failed to get the current value of '{}': {:?}", CTLNAME, e),
-                Ok(v) => {
-                    println!("ip forwarding already has the expected value: {}", v);
-                }
-            },
-            Err(e) => println!("failed to read {} env var: {:?}", IP_FORWARDING, e),
-        }
-    }
-
     let args = ["-f", "-c", BIRD_CFG];
     println!("starting {} with args {:?}", BIRD_BIN, args);
 
